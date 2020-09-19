@@ -22,9 +22,9 @@ export SPIELWIESE_DOMAIN="spielwiese.example.com"
 
 ## Networks
 ```sh
-docker network create --attachable --scope swarm --opt encrypted traefik-vpn
-docker network create --attachable --scope swarm --opt encrypted vpn
-docker network create --scope swarm --opt encrypted traefik-web
+docker network create --driver overlay --attachable --scope swarm --opt encrypted traefik-vpn
+docker network create --driver overlay --attachable --scope swarm --opt encrypted vpn
+docker network create --driver overlay --scope swarm --opt encrypted traefik-web
 ```
 
 ## Deploy
