@@ -1,0 +1,84 @@
+version: "3.8"
+
+services:
+  traefik:
+    deploy:
+      placement:
+        constraints:
+          - 'node.role == manager'
+      labels:
+        traefik.enable: 'true'
+        traefik.http.middlewares.default-compress.compress: 'true'
+        traefik.http.middlewares.default-headers-https.headers.browserXssFilter: 'true'
+        traefik.http.middlewares.default-headers-https.headers.contentTypeNosniff: 'true'
+        traefik.http.middlewares.default-headers-https.headers.customRequestHeaders.X-Forwarded-Proto: https
+        traefik.http.middlewares.default-headers-https.headers.customResponseHeaders.server: ""
+        traefik.http.middlewares.default-headers-https.headers.forceSTSHeader: 'true'
+        traefik.http.middlewares.default-headers-https.headers.frameDeny: 'true'
+        traefik.http.middlewares.default-headers-https.headers.sslRedirect: 'true'
+        traefik.http.middlewares.default-headers-https.headers.stsSeconds: 31536000
+        traefik.http.middlewares.default-headers-https.headers.stsPreload: 'true'
+        traefik.http.middlewares.default-compress.compress: 'true'
+        traefik.http.middlewares.default-http.redirectScheme.scheme: https
+        traefik.http.middlewares.default-http.redirectScheme.permanent: 'true'
+        traefik.http.middlewares.default-https.chain.middlewares: default-headers-https,default-compress
+        traefik.http.routers.default-redirect.entrypoints: http
+        traefik.http.routers.default-redirect.middlewares: default-http
+        traefik.http.routers.default-redirect.rule: "HostRegexp(`{any:.*}`)"
+        traefik.http.routers.default-redirect.service: noop@internal
+        traefik.http.services.traefik.loadbalancer.server.port: '80'
+    image: traefik:latest
+    networks:
+      - traefik-web
+      - traefik-vpn
+    ports:
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+      - target: 443
+        published: 443
+        protocol: tcp
+        mode: host
+      - target: 1194
+        published: 1194
+        protocol: udp
+        mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/docker/traefik:/etc/traefik/acme
+    configs:
+      - source: traefik_services.yml.v1
+        target: /services.yml
+    environment:
+      CF_DNS_API_TOKEN: ${CF_DNS_API_TOKEN?err}
+      CF_ZONE_API_TOKEN: ${CF_ZONE_API_TOKEN?err}
+    command:
+      - --accesslog=true
+      - --accesslog.fields.defaultmode=keep
+      - --accesslog.fields.headers.defaultmode=keep
+      # For the example only. Remove it for production!
+      - --certificatesResolvers.default.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
+      - --certificatesResolvers.default.acme.dnsChallenge.provider=cloudflare
+      - --certificatesResolvers.default.acme.dnsChallenge.resolvers=1.1.1.1:53,1.0.0.1:53
+      - --certificatesResolvers.default.acme.storage=/etc/traefik/acme/acme.json
+      - --entrypoints.http.address=:80
+      - --entrypoints.https.address=:443
+      - --entrypoints.openvpn-udp.address=:1194/udp
+      - --log.level=INFO
+      - --metrics.prometheus=true
+      - --providers.docker.endpoint=unix:///var/run/docker.sock
+      - --providers.docker.defaultRule=Host(`{{ index .Labels "ai.ix.fqdn"}}`)
+      - --providers.docker.exposedByDefault=false
+      - --providers.docker.swarmModeRefreshSeconds=3
+      - --providers.file.filename=/services.yml
+networks:
+  traefik-vpn:
+    external: true
+  traefik-web:
+    external: true
+  vpn:
+    external: true
+configs:
+  traefik_services.yml.v1:
+    external: true

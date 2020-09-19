@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  openvpn-launcher:
+    deploy:
+      placement:
+        constraints:
+          - 'node.role == manager'
+    image: ixdotai/swarm-launcher:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+    environment:
+      LAUNCH_IMAGE: ixdotai/openvpn:latest
+      LAUNCH_PULL: 'true'
+      LAUNCH_EXT_NETWORKS: 'traefik-vpn vpn'
+      LAUNCH_PROJECT_NAME: 'vpn'
+      LAUNCH_SERVICE_NAME: 'vpn'
+      LAUNCH_CAP_ADD: 'NET_ADMIN'
+      LAUNCH_PRIVILEGED: 'true'
+      LAUNCH_ENVIRONMENTS: 'OVPN_NATDEVICE=eth0@_@eth1@_@eth2 OVPN_DNSMASQ=1'
+      LAUNCH_VOLUMES: '/var/docker/openvpn:/etc/openvpn:rw'

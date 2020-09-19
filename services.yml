@@ -1,0 +1,11 @@
+udp:
+  routers:
+    openvpn-udp:
+      entryPoints:
+        - openvpn-udp
+      service: openvpn-udp
+  services:
+    openvpn-udp:
+      loadBalancer:
+        servers:
+          - address: "vpn_vpn_1:1194"

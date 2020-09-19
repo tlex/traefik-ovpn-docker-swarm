@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  spielwiese:
+    image: ixdotai/spielwiese:latest
+    networks:
+      - traefik-web
+      - vpn
+    environment:
+      TZ: Europe/Berlin
+    deploy:
+      restart_policy:
+        delay: 5s
+      labels:
+        ai.ix.fqdn: "${SPIELWIESE_DOMAIN?err}"
+        traefik.enable: 'true'
+        traefik.http.routers.spielwiese-example-com.entrypoints: https
+        traefik.http.routers.spielwiese-example-com.middlewares: default-https
+        traefik.http.routers.spielwiese-example-com.tls.certResolver: 'default'
+        traefik.http.services.spielwiese-example-com.loadbalancer.server.port: '8000'
+networks:
+  traefik-vpn:
+    external: true
+  vpn:
+    external: true
