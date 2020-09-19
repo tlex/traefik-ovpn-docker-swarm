@@ -19,7 +19,7 @@ services:
         traefik.http.routers.spielwiese-example-com.tls.certResolver: 'default'
         traefik.http.services.spielwiese-example-com.loadbalancer.server.port: '8000'
 networks:
-  traefik-vpn:
+  traefik-web:
     external: true
   vpn:
     external: true
