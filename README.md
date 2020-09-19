@@ -1,6 +1,6 @@
 # traefik-ovpn-docker-swarm
 
-For details, see the blog entry: alex.thom.ae/2020/09/19/traefik-openvpn-docker-swarm/
+For details, see the blog entry: [alex.thom.ae/2020/09/19/traefik-openvpn-docker-swarm/](https://alex.thom.ae/2020/09/19/traefik-openvpn-docker-swarm/)
 
 ## Variables
 ```sh
