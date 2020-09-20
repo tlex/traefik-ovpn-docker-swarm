@@ -29,7 +29,7 @@ docker network create --driver overlay --scope swarm --opt encrypted traefik-web
 
 ## Deploy
 ```sh
-docker run -v "${OVPN_DATA}":/etc/openvpn --log-driver=none --rm ixdotai/openvpn ovpn_genconfig -u udp://"${ENDPOINT}" -b -Q -n 192.168.255.1 -n 1.1.1.1 -n 1.0.0.1
+docker run -v "${OVPN_DATA}":/etc/openvpn --log-driver=none --rm ixdotai/openvpn ovpn_genconfig -u udp://"${ENDPOINT}" -b -Q -n 192.168.255.1
 docker run -v "${OVPN_DATA}":/etc/openvpn --log-driver=none --rm -it ixdotai/openvpn ovpn_initpki
 docker stack deploy vpn -c stack-vpn.yml
 docker config create traefik_services.yml.v1 services.yml
