@@ -77,8 +77,6 @@ networks:
     external: true
   traefik-web:
     external: true
-  vpn:
-    external: true
 configs:
   traefik_services.yml.v1:
     external: true
